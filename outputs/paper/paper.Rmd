@@ -1,0 +1,142 @@
+---
+title: "TBD"
+subtitle: "TBD"
+author: "Morgaine Westin"
+thanks: "Code and data are available at: https://github.com/westinmo/Toronto-Crime-Statistics"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+output:
+  bookdown::pdf_document2:
+toc: FALSE
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#tinytex::install_tinytex()
+library(tinytex)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(dplyr)
+library(here)
+#install.packages("wesanderson")
+library(wesanderson)
+#install.packages("palettetown")
+library(palettetown)
+
+crime_clean <- read_csv(here("inputs/data/clean_crime_data.csv")) 
+  #grabbing cleaned dataset
+factors <- c(1:4)
+crime_clean[,factors] <- lapply(crime_clean[,factors], as.factor)
+  #converting non numeric values to factors (including year)
+```
+
+# Introduction
+
+
+
+
+# Data
+
+## Data Source
+
+This paper utilizes data on reported crimes in Toronto obtained from the Toronto Police Service Annual Statistical Report (ASR). The ASR is an annual overview of police related datasets covering a range of topics such as crime statistics, budget, traffic reports, and communications (cite). Since 2019, datasets from the ASR have been openly available to the public and can be accessed through the Toronto Police Service Public Safety Data Portal or the City of Toronto Open Data Portal. The Reported Crimes dataset analyzed in this paper was obtained in csv format from the City of Toronto Open Data Portal [@citeR] on R using the package `opendatatoronto` [@opendatapkg]. 
+
+## Methodology and Data Collection
+
+## Data Characteristics
+
+The Reported Crimes dataset contains aggregated data of all criminal offenses reported to the TPS between the years 2014 and 2020. The criminal reports in the dataset contain those that the TPS deemed unfounded after further investigation, crimes which may have taken place outside the city of Toronto, and crimes with no verified location. Data were processed and analyzed in R[@citeR] using the `tidyverse` package [@tidy]. There were 2031 observations in the dataset and 8 attributes: index, object ID, reported year, category, subtype, count (number of crimes reported), and count cleared (the number of criminal reports that were cleared). The first two attributes, index and object ID, were identical numerical identifiers which were removed prior to analysis. The data were aggregated by geographical division, category, subtype and year. A sample view of the dataset is displayed below. 
+```{r echo = FALSE}
+head(crime_clean)
+```
+
+Our data is of penguins Figure \@ref(fig:counts)
+
+```{r counts, fig.cap="Frequencies of Crimes Reported and Crimes Cleared by Year (2014-2019)", echo = FALSE}
+crime_filt <- crime_clean %>% 
+  dplyr::select(Count_, ReportedYear, CountCleared) %>%
+  group_by(ReportedYear) %>% dplyr::summarize_all(sum) 
+
+library(reshape2)
+meltcrime <- melt(crime_filt) 
+
+ggplot(meltcrime, aes(x = ReportedYear, y = value, fill = variable)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = wes_palette("Royal2", 2), labels = c("Total Reported", "Cleared")) + 
+  geom_text(aes(label=value), size = 3, position = position_stack(vjust = 0.5)) +
+  theme_light() + 
+  labs(x = "Year", y = "Number of Reports", fill = "Reported Crimes", title = "Total Number of Reported Crimes and Cleared Crimes")
+```
+
+
+```{r yearcat, fig.cap="Number of Crimes Reported in Toronto by Category and Year (2014-2019)", echo = FALSE}
+crime_clean %>% 
+  dplyr::select(Category, Count_, ReportedYear, CountCleared) %>%
+  group_by(ReportedYear, Category) %>% dplyr::summarize_all(sum) %>%
+  ggplot() + 
+  geom_point(aes(x = ReportedYear, y = Count_, color = Category), size = 2) +  
+  scale_color_poke(pokemon = 'Charizard', spread = NULL)+ 
+  theme_light() + 
+  labs(x = "Year", y = "Number of Crimes Reported", 
+       title = "Number of Crimes Reported in Toronto by Category and Year") + 
+  guides(color = guide_legend(override.aes = list(size=3)))
+scale_color_manual(values = wes_palette("Zissou1", 6, type = "continuous"))
+```
+
+```{r table, echo = FALSE}
+crime_wide <- crime_clean %>% 
+  dplyr::select(Subtype, Count_, ReportedYear, Category) %>%
+  group_by(Category, Subtype, ReportedYear) %>% dplyr::summarize_all(sum) %>%
+  pivot_wider(names_from = ReportedYear, values_from = Count_) 
+
+kbl(crime_wide[-1], caption = "Offense Subtypes of Crimes Reported to TPS by Year (2014-2019)", booktabs = T) %>%
+    kable_styling(bootstrap_options = c("hover", "condensed")) %>%
+    kable_paper("striped", full_width = F) %>%
+    group_rows("Crimes Against Property",2, 10) %>%
+    group_rows("Crimes Against the Person", 11, 16)  %>%
+    group_rows("Other Criminal Code Violations", 18,19)  %>%
+    group_rows("Controlled Drugs and Substances Act", 1, 1)  %>%
+    group_rows("Criminal Code Traffic", 17, 17)  %>%
+    group_rows("Other Federal Statute Violations", 20, 20)
+```
+
+
+```{r geodiv, fig.cap="Bills of penguins",echo = FALSE}
+crime_clean %>% 
+  dplyr::select(GeoDivision, Count_, ReportedYear) %>%
+  group_by(ReportedYear, GeoDivision) %>% dplyr::summarize_all(sum) %>%
+  ggplot() + geom_bar(aes(x = GeoDivision, y = Count_, fill = ReportedYear), stat="identity") +
+  coord_flip() +
+  scale_fill_poke(pokemon = 'squirtle', spread = NULL) +
+  theme_light() +
+  labs(x = "Geographical Division", y = "Number of Crimes Reported", 
+       title = "Total Number of Crimes Reported in Toronto by Division and Year")
+
+citation("palettetown")
+```
+corb corb corb^[corb?]
+
+
+```{r}
+
+```
+
+
+Our data is of penguins (Figure \@ref(fig:bills)). analyzed with R [@citeR].
+
+```{r bills, fig.cap="Bills of penguins", echo = FALSE}
+
+```
+
+Talk more about it.
+
+Also bills and their average (Figure \@ref(fig:billssssss)). (Notice how you can change the height and width so they don't take the whole page?)
+
+```{r billssssss, fig.cap="More bills of penguins", echo = FALSE, fig.width=8, fig.height=4}
+
+```
+
+
+
