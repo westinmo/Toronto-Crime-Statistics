@@ -151,11 +151,12 @@ Reported crimes are further broken up into subtypes based on the six main catego
 
 
 ```{r subtype, echo = FALSE, fig.width=8, fig.height=4}
+#filter and aggregate data based on subtype and year
 crime_wide <- crime_clean %>% 
   dplyr::select(Subtype, Count_, ReportedYear, Category) %>%
   group_by(Category, Subtype, ReportedYear) %>% dplyr::summarize_all(sum) %>%
   pivot_wider(names_from = ReportedYear, values_from = Count_) 
-
+#create table with crime counts by subtype
 kbl(crime_wide[-1], caption = "Offense Subtypes of Crimes Reported to TPS", booktabs = T, longtable = TRUE) %>%
     kable_styling(bootstrap_options = c("hover", "condensed")) %>%
     kable_paper("striped", full_width = F) %>%
@@ -177,12 +178,13 @@ Crimes against property is the category with the most offense subtypes, with the
 The ‘GeoDivision’ variable in the dataset refers to the geographical division in which the reported crime took place. The divisions correspond to the TPS divisions, pictured geographically in Figure \@ref(fig:divmap)^[Source: Toronto Police Service [@TPSdiv]]. Figure \@ref(fig:geodiv) displays the total number of crimes reported to the TPS by division^[Division 54 and 55 were officially consolidated into one division in 2018] and year. 
 
 
-\
+
 ```{r divmap, out.width="80%", fig.cap="Toronto Police Command and Divisional Boundaries", fig.height=3.5, echo = FALSE}
 knitr::include_graphics("TPS_divisions.png")
 ```
 
 ```{r geodiv, fig.cap="Total Number of Crimes Reported in Toronto by Division and Year",echo = FALSE, fig.width=8, fig.height=3.5}
+#plot crime counts by year and geographical division
 crime_clean %>% 
   dplyr::select(GeoDivision, Count_, ReportedYear) %>%
   group_by(ReportedYear, GeoDivision) %>% dplyr::summarize_all(sum) %>%
