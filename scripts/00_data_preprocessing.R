@@ -1,5 +1,5 @@
 #### Preamble ####
-# Purpose: 
+# Purpose: Set up and pre-processing TPS crime statistics dataset
 # Author: Morgaine
 # Date: 20 January 2021
 # Pre-requisites: None
@@ -7,6 +7,7 @@
 #### Workspace set-up ####
 library(tidyverse)
 library(opendatatoronto)
+library(here)
 
 #### Code from opendatatoronto ####
 # grab police annual statistics report package
@@ -29,13 +30,12 @@ crime_clean <- crime_data[-c(1, 2)]
 #check data for NAs (0)
 sum(is.na(crime_clean))
 
-factors <- c(1:4)
-crime_clean[,factors] <- lapply(crime_clean[,factors], as.factor)
-
 #### Descriptive Summaries ####
 str(crime_clean)
 summary(crime_clean)
 
 #### Saving clean data ####
 write_csv(crime_clean, here("inputs/data/clean_crime_data.csv"))
-str(crime_clean)
+
+
+
