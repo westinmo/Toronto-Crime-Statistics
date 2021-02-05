@@ -7,4 +7,4 @@ More information on the dataset can be found on the [Toronto Police Service Publ
 **Contents**
 - Csv files (raw and cleaned) can be found in /inputs/data
 - R scripts can be found in /scripts
-- R markdown, reference final, and the final pdf can be found in /outputs/paper
+- R markdown, references, and the final pdf can be found in /outputs/paper
